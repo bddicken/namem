@@ -10,6 +10,7 @@ It can produce either a quizzing web-application of a flashcard document.
 from wand.image import Image as WI
 from PIL        import Image as PI
 import numpy
+import argparse
 
 student_counter = 0
 
@@ -93,8 +94,21 @@ def grab_photos(page_img_file_name, page_num, rows, cols):
                 name_img.save('./name-' + str(student_counter) + '.png')
                 student_counter += 1
 
+def handle_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--roster', required=True, type=str, 
+                        help='''A path to a PDF photo roster file, downloaded from uaccess.''')
+    parser.add_argument('--quiz', required=True, type=str,
+                        help='''A directory to place the resulting roster quiz in.
+                              If the directory already exists, it will not generate the quiz,
+                              unless --force is used.''')
+    parser.add_argument('--force', default=False, action='store_true',
+                        help='''If set, will overwrite the quiz output directory''')
+    return parser.parse_args()
+
 def main():
-    im = WI(filename="./a1.pdf", resolution=300)
+    args = handle_args()
+    im = WI(filename=args.roster, resolution=300)
     for i, page in enumerate(im.sequence):
         pi = WI(page)
         pi.alpha_channel = False
