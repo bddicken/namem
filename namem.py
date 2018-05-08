@@ -58,7 +58,7 @@ def check_white_ratio(pil_img, ratio):
                 white_count += 1.0
     return (white_count / total) > ratio
 
-def extract_images(page_img_file_name, page_num, rows, cols, namemdir):
+def extract_images(page_img_file_name, page_num, rows, cols, namem_dir):
     '''
     Extracts all of the photos and names from an image file.
     page_img_file_name is the name of the file to open and process.
@@ -87,13 +87,13 @@ def extract_images(page_img_file_name, page_num, rows, cols, namemdir):
             # Grab student photo
             photo_img = page_img.crop((tx, ty, tx + width, ty + height))
             if not check_white_ratio(photo_img, MOSTLY_WHITE):
-                photo_img.save(namemdir + '/photos/' + str(student_counter) + '.png')
+                photo_img.save(namem_dir + '/photos/' + str(student_counter) + '.png')
                 # Grab student name
                 name_img = page_img.crop((tx-NAME_OFFSET,
                                       ty+height, 
                                       tx + width + (NAME_OFFSET*2),
                                       ty + height + spc_y))
-                name_img.save(namemdir + '/names/' + str(student_counter) + '.png')
+                name_img.save(namem_dir + '/names/' + str(student_counter) + '.png')
                 student_counter += 1
 
 def handle_args():
@@ -115,7 +115,7 @@ def handle_args():
 def check_output_directory_ok(args):
     return args.force or not os.path.exists(args.out)
 
-def create_namemdir(args):
+def create_namem_dir(args):
     if args.force and os.path.exists(args.out):
         try:
             shutil.rmtree(args.out)
@@ -132,12 +132,12 @@ def create_namemdir(args):
 
 def main():
     args = handle_args()
-    namemok = check_output_directory_ok(args)
-    if not namemok:
+    namem_ok = check_output_directory_ok(args)
+    if not namem_ok:
         print('Quiz output directory already exists.')
         print('Choose different directory, or use --force to overwrite')
     else:
-        if create_namemdir(args):
+        if create_namem_dir(args):
             im = WI(filename=args.roster, resolution=300)
             for i, page in enumerate(im.sequence):
                 pi = WI(page)
