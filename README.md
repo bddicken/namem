@@ -1,6 +1,6 @@
 # namem
 
-Generate an quiz given a roster PDF file.
+Can be use to generate a quiz given a roster PDF file.
 This script specifically works with PDF roster files generated via UAccess for courses at the University of Arizona.
 The steps to use this are:
 
