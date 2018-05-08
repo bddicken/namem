@@ -58,7 +58,7 @@ def check_white_ratio(pil_img, ratio):
                 white_count += 1.0
     return (white_count / total) > ratio
 
-def grab_photos(page_img_file_name, page_num, rows, cols, namemdir):
+def extract_images(page_img_file_name, page_num, rows, cols, namemdir):
     '''
     Extracts all of the photos and names from an image file.
     page_img_file_name is the name of the file to open and process.
@@ -144,7 +144,7 @@ def main():
                 pi.alpha_channel = False
                 page = './roster-' + str(i) + 's.png'
                 pi.save(filename=page)
-                grab_photos(page, i, ROWS_PER_PAGE, COLS_PER_PAGE, args.out)
+                extract_images(page, i, ROWS_PER_PAGE, COLS_PER_PAGE, args.out)
                 os.remove(page)
 
 main()
