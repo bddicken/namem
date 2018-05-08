@@ -11,6 +11,8 @@ from wand.image import Image as WI
 from PIL        import Image as PI
 import numpy
 import argparse
+import os
+import shutil
 
 student_counter = 0
 
@@ -56,7 +58,7 @@ def check_white_ratio(pil_img, ratio):
                 white_count += 1.0
     return (white_count / total) > ratio
 
-def grab_photos(page_img_file_name, page_num, rows, cols):
+def grab_photos(page_img_file_name, page_num, rows, cols, quiz_dir):
     '''
     Extracts all of the photos and names from an image file.
     page_img_file_name is the name of the file to open and process.
@@ -85,16 +87,20 @@ def grab_photos(page_img_file_name, page_num, rows, cols):
             # Grab student photo
             photo_img = page_img.crop((tx, ty, tx + width, ty + height))
             if not check_white_ratio(photo_img, MOSTLY_WHITE):
-                photo_img.save('./stu-' + str(student_counter) + '.png')
+                photo_img.save(quiz_dir + '/photos/' + str(student_counter) + '.png')
                 # Grab student name
                 name_img = page_img.crop((tx-NAME_OFFSET,
                                       ty+height, 
                                       tx + width + (NAME_OFFSET*2),
                                       ty + height + spc_y))
-                name_img.save('./name-' + str(student_counter) + '.png')
+                name_img.save(quiz_dir + '/names/' + str(student_counter) + '.png')
                 student_counter += 1
 
 def handle_args():
+    '''
+    Creates an argument parser and processes the arguments.
+    Returns the arguments object to the caller.
+    '''
     parser = argparse.ArgumentParser()
     parser.add_argument('--roster', required=True, type=str, 
                         help='''A path to a PDF photo roster file, downloaded from uaccess.''')
@@ -106,15 +112,40 @@ def handle_args():
                         help='''If set, will overwrite the quiz output directory''')
     return parser.parse_args()
 
+def check_output_directory_ok(args):
+    return args.force or not os.path.exists(args.quiz)
+
+def create_quiz_dir(args):
+    if args.force and os.path.exists(args.quiz):
+        try:
+            shutil.rmtree(args.quiz)
+        except:
+            return False
+    try:
+        shutil.copytree('./template', args.quiz)
+        os.makedirs(args.quiz + '/photos')
+        os.makedirs(args.quiz + '/names')
+    except:
+        print('Failed to make new directories')
+        return False
+    return True
+
 def main():
     args = handle_args()
-    im = WI(filename=args.roster, resolution=300)
-    for i, page in enumerate(im.sequence):
-        pi = WI(page)
-        pi.alpha_channel = False
-        page='./roster-' + str(i) + 's.png'
-        pi.save(filename=page)
-        grab_photos(page, i, ROWS_PER_PAGE, COLS_PER_PAGE)
+    quiz_ok = check_output_directory_ok(args)
+    if not quiz_ok:
+        print('Quiz output directory already exists.')
+        print('Choose different directory, or use --force to overwrite')
+    else:
+        if create_quiz_dir(args):
+            im = WI(filename=args.roster, resolution=300)
+            for i, page in enumerate(im.sequence):
+                pi = WI(page)
+                pi.alpha_channel = False
+                page = './roster-' + str(i) + 's.png'
+                pi.save(filename=page)
+                grab_photos(page, i, ROWS_PER_PAGE, COLS_PER_PAGE, args.quiz)
+                os.remove(page)
 
 main()
 

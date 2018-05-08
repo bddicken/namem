@@ -1,0 +1,131 @@
+<html>
+<head>
+  <title>Quizify</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+</head>
+
+<body onload="init();">
+
+  <h1>Quizify</h1>
+  <div id="reset" style="display:none;">
+    <h2>You've gone through the whole roster.</h2>
+    <button id="reset_button" onclick="init();">Reset</button>
+  </div>
+  <div id="quiz">
+    <h2>Who is this student?</h2>
+    <img id="photo_img" src="" width="300px"/>
+    <br/>
+    <button id="progress" onclick="progress_quiz();">Reveal</button>
+    <br/><br/>
+    <img id="name_img" src="" width="250px" style="display:none;"/>
+  </div>
+
+</body>
+
+<style>
+
+button {
+  padding: 10px;
+  font-size:15px;
+  background-color: rgb(255, 255, 255);
+  width: 100px;
+  font-family: 'Roboto', sans-serif, Arial;
+}
+html {
+  text-align: center;
+  font-family: 'Roboto', sans-serif, Arial;
+}
+
+</style>
+
+<script>
+
+// To-be populated for the quiz
+// Will be a list of pairs of image file names
+var roster = [];
+// The current index within the roster list
+var roster_index = 0;
+var name_revealed = false;
+
+/**
+ * Randomize array element order in-place.
+ * Using Durstenfeld shuffle algorithm.
+ * Taken from SO and then modified by bddicken.
+ */
+function shuffle_array(arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+  }
+}
+
+/**
+ * Generate al list of the file names for student photos and names.
+ * Shuffle them.
+ */
+function initialize_roster_shuffle(num_people) {
+  for ( var i = 0; i < num_people; i++) {
+    var person = {};
+    person.photo_file = './photos/' + i + '.png';
+    person.name_file = './names/' + i + '.png';
+    roster.push(person);
+  }
+  shuffle_array(roster);
+  roster_index = 0;
+}
+
+/**
+ * Initialize the quiz.
+ * This is called on page load and also when the quiz is reset.
+ */
+function init() {
+  show('quiz');
+  hide('reset');
+  initialize_roster_shuffle(16);
+  show_next_question();
+}
+
+/**
+ * Go to the next step in the quiz.
+ * This could be one of three things:
+ *    * Reveal the name of a student.
+ *    * Display the next photo.
+ *    * Show the end-of-quiz display.
+ */
+function progress_quiz() {
+  if (roster_index >= roster.length-1) {
+    hide('quiz');
+    show('reset');
+  } else {
+    if (name_revealed) {
+      roster_index++;
+      hide('name_img');
+      document.getElementById('progress').innerHTML = 'Reveal';
+      show_next_question();
+    } else {
+      show('name_img');
+      document.getElementById('progress').innerHTML = 'Next';
+    }
+  }
+  name_revealed = !name_revealed;
+}
+
+
+function hide(id) {
+  document.getElementById(id).style = 'display:none;';
+}
+
+function show(id) {
+  document.getElementById(id).style = 'display:inline;';
+}
+
+function show_next_question() {
+  document.getElementById('photo_img').src = roster[roster_index].photo_file;
+  document.getElementById('name_img').src = roster[roster_index].name_file;
+}
+
+</script>
+</html>
+
