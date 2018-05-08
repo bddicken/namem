@@ -13,6 +13,9 @@ The steps to use this are:
 
 For FERPA reasons, you may want to stick to only using this quiz locally, rather than actually hosting on a public-facing web-server.
 
+Why call it namem?
+NAME Memorization, or NAme MEMorization.
+
 ## Dependencies
 
 Requires a few standard python modules: `os`, `shutil`, and `argparse`.
@@ -24,3 +27,4 @@ Something along the lines of:
 ```
 export MAGICK_HOME=/usr/local/Cellar/imagemagick\@6/6.9.9-41/
 ```
+
