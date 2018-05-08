@@ -4,7 +4,7 @@ The purpose of this program is to convert a roster PDF file into various quizzin
 The program takes a PDF file as input. In particular, it expects a class roster PDF file generated
 by UAccess with images, names, and SIDS of the students.
 This program expects a rather specific input document formatting.
-It can produce either a quizzing web-application of a flashcard document.
+It produces a quizzing web-application.
 '''
 
 from wand.image import Image as WI
@@ -58,7 +58,7 @@ def check_white_ratio(pil_img, ratio):
                 white_count += 1.0
     return (white_count / total) > ratio
 
-def grab_photos(page_img_file_name, page_num, rows, cols, quiz_dir):
+def grab_photos(page_img_file_name, page_num, rows, cols, namemdir):
     '''
     Extracts all of the photos and names from an image file.
     page_img_file_name is the name of the file to open and process.
@@ -87,13 +87,13 @@ def grab_photos(page_img_file_name, page_num, rows, cols, quiz_dir):
             # Grab student photo
             photo_img = page_img.crop((tx, ty, tx + width, ty + height))
             if not check_white_ratio(photo_img, MOSTLY_WHITE):
-                photo_img.save(quiz_dir + '/photos/' + str(student_counter) + '.png')
+                photo_img.save(namemdir + '/photos/' + str(student_counter) + '.png')
                 # Grab student name
                 name_img = page_img.crop((tx-NAME_OFFSET,
                                       ty+height, 
                                       tx + width + (NAME_OFFSET*2),
                                       ty + height + spc_y))
-                name_img.save(quiz_dir + '/names/' + str(student_counter) + '.png')
+                name_img.save(namemdir + '/names/' + str(student_counter) + '.png')
                 student_counter += 1
 
 def handle_args():
@@ -104,7 +104,7 @@ def handle_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--roster', required=True, type=str, 
                         help='''A path to a PDF photo roster file, downloaded from uaccess.''')
-    parser.add_argument('--quiz', required=True, type=str,
+    parser.add_argument('--out', required=True, type=str,
                         help='''A directory to place the resulting roster quiz in.
                               If the directory already exists, it will not generate the quiz,
                               unless --force is used.''')
@@ -113,18 +113,18 @@ def handle_args():
     return parser.parse_args()
 
 def check_output_directory_ok(args):
-    return args.force or not os.path.exists(args.quiz)
+    return args.force or not os.path.exists(args.out)
 
-def create_quiz_dir(args):
-    if args.force and os.path.exists(args.quiz):
+def create_namemdir(args):
+    if args.force and os.path.exists(args.out):
         try:
-            shutil.rmtree(args.quiz)
+            shutil.rmtree(args.out)
         except:
             return False
     try:
-        shutil.copytree('./template', args.quiz)
-        os.makedirs(args.quiz + '/photos')
-        os.makedirs(args.quiz + '/names')
+        shutil.copytree('./template', args.out)
+        os.makedirs(args.out + '/photos')
+        os.makedirs(args.out + '/names')
     except:
         print('Failed to make new directories')
         return False
@@ -132,19 +132,19 @@ def create_quiz_dir(args):
 
 def main():
     args = handle_args()
-    quiz_ok = check_output_directory_ok(args)
-    if not quiz_ok:
+    namemok = check_output_directory_ok(args)
+    if not namemok:
         print('Quiz output directory already exists.')
         print('Choose different directory, or use --force to overwrite')
     else:
-        if create_quiz_dir(args):
+        if create_namemdir(args):
             im = WI(filename=args.roster, resolution=300)
             for i, page in enumerate(im.sequence):
                 pi = WI(page)
                 pi.alpha_channel = False
                 page = './roster-' + str(i) + 's.png'
                 pi.save(filename=page)
-                grab_photos(page, i, ROWS_PER_PAGE, COLS_PER_PAGE, args.quiz)
+                grab_photos(page, i, ROWS_PER_PAGE, COLS_PER_PAGE, args.out)
                 os.remove(page)
 
 main()

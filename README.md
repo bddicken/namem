@@ -1,15 +1,15 @@
-# quizify
+# namem
 
 Generate an quiz given a roster PDF file.
 This script specifically works with PDF roster files generated via UAccess for courses at the University of Arizona.
 The steps to use this are:
 
 * Download the PDF roster file for your course.
-* Run `quizify.py`.
+* Run `namem.py`.
   You'll need to specify at least two arguments:
-  Tell `quizify.py` where your roster PDF file is with `--roster`.
-  Tell `quizify.py` a directory to generate the quiz in with `--quiz`.
-* Once the script has finished running, navigate to the directory that you generated the quiz to, and open up `index.html` in a web-browser.
+  Tell `namem.py` where your roster PDF file is with `--roster`.
+  Tell `namem.py` a directory to generate the quiz in with `--out`.
+* Once the script has finished running, navigate to the directory that you generated the namem quiz to, and open up `index.html` in a web-browser.
 
 For FERPA reasons, you may want to stick to only using this quiz locally, rather than actually hosting on a public-facing web-server.
 
