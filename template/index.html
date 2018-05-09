@@ -81,6 +81,7 @@ function initialize_roster_shuffle(num_people) {
  * This is called on page load and also when the quiz is reset.
  */
 function init() {
+  name_revealed = false;
   show('quiz');
   hide('reset');
   initialize_roster_shuffle(16);
