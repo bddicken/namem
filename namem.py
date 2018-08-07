@@ -130,6 +130,14 @@ def create_namem_dir(args):
         return False
     return True
 
+def set_count_in_quiz(args, count):
+    template = open('./template/index.html', 'r')
+    new = open(args.out + '/index.html', 'w')
+    for line in template:
+        new.write(line.replace('REPLACE_WITH_NUM_STUDENTS', str(count)))
+    template.close()
+    new.close()
+
 def main():
     args = handle_args()
     namem_ok = check_output_directory_ok(args)
@@ -146,6 +154,7 @@ def main():
                 pi.save(filename=page)
                 extract_images(page, i, ROWS_PER_PAGE, COLS_PER_PAGE, args.out)
                 os.remove(page)
+            set_count_in_quiz(args, student_counter)
 
 main()
 
